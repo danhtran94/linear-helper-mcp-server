@@ -1,0 +1,37 @@
+{
+  "name": "linear-helper-mcp-server",
+  "version": "1.0.0",
+  "description": "Linear Model Context Protocol server with extended functionality",
+  "module": "src/server.ts",
+  "type": "module",
+  "private": true,
+  "keywords": ["linear", "mcp", "model-context-protocol", "graphql", "productivity"],
+  "author": "Danh Tran",
+  "scripts": {
+    "dev": "bun --watch src/server.ts",
+    "build": "bun build src/server.ts --outdir dist --target bun",
+    "start": "bun dist/server.js",
+    "test": "bun test",
+    "type-check": "tsc --noEmit",
+    "health": "bun src/server.ts --health-check",
+    "genql": "genql --endpoint https://api.linear.app/graphql --output ./generated",
+    "genql:auth": "genql --endpoint https://api.linear.app/graphql -H \"Authorization: $LINEAR_API_KEY\" --output ./generated",
+    "mcp:stdio": "bun src/server.ts",
+    "clean": "rm -rf dist/ coverage/",
+    "dev-test:health": "bun scripts/dev-tests/health.ts",
+    "dev-test:initiatives": "bun scripts/dev-tests/initiatives.ts",
+    "dev-test:milestones": "bun scripts/dev-tests/milestones.ts",
+    "dev-test:cycles": "bun scripts/dev-tests/cycles.ts"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.1",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@genql/cli": "^6.3.3",
+    "@types/bun": "latest"
+  },
+  "engines": {
+    "bun": ">=1.2.14"
+  }
+}
