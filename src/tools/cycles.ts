@@ -206,7 +206,7 @@ export const listCycles: ToolHandler<ListCyclesParams> = async (params) => {
           `   #️⃣ Cycle #${cycle.number} • 📊 ${progressPercent}% • 🎯 ${cycleStatus}`,
           `   📅 ${startsAtStr} → ${endsAtStr}`,
           `   👥 Team: ${cycle.team?.name || "Unknown"} (${cycle.team?.key || "N/A"})`,
-          ...(cycle.description ? [`   📝 ${cycle.description.substring(0, 100)}${cycle.description.length > 100 ? "..." : ""}`] : []),
+          ...(cycle.description ? [`   📝 ${cycle.description}`] : []),
           ""
         ].join("\n");
       }),
@@ -388,7 +388,7 @@ export const getCycle: ToolHandler<GetCycleParams> = async (params) => {
       `   • **Name:** ${team?.name || "Unknown"}`,
       `   • **Key:** ${team?.key || "N/A"}`,
       `   • **ID:** ${team?.id || "Unknown"}`,
-      ...(team?.description ? [`   • **Description:** ${team.description.substring(0, 150)}${team.description.length > 150 ? "..." : ""}`] : []),
+      ...(team?.description ? [`   • **Description:** ${team.description}`] : []),
       ...(team?.cyclesEnabled !== undefined ? [
         `   • **Cycles Enabled:** ${team.cyclesEnabled ? "Yes" : "No"}`,
         ...(team.cycleDuration ? [`   • **Cycle Duration:** ${team.cycleDuration} weeks`] : []),
@@ -449,53 +449,3 @@ export const getCycle: ToolHandler<GetCycleParams> = async (params) => {
     };
   }
 };
-
-// MCP Schema definitions for the tools
-export const listCyclesSchema = {
-  name: "list_cycles",
-  description: "List team cycles with optional filtering by team, status, and search terms",
-  inputSchema: {
-    type: "object",
-    properties: {
-      teamId: {
-        type: "string",
-        pattern: "^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
-        description: "Filter cycles by team ID (UUID format)"
-      },
-      status: {
-        type: "string",
-        enum: ["active", "next", "previous", "future", "past"],
-        description: "Filter cycles by status"
-      },
-      limit: {
-        type: "number",
-        minimum: 1,
-        maximum: 100,
-        default: 50,
-        description: "Maximum number of cycles to return (1-100)"
-      },
-      search: {
-        type: "string",
-        description: "Search cycles by name or description"
-      }
-    },
-    additionalProperties: false
-  }
-} as const;
-
-export const getCycleSchema = {
-  name: "get_cycle",
-  description: "Get detailed information about a specific cycle including associated issues and team details",
-  inputSchema: {
-    type: "object",
-    properties: {
-      id: {
-        type: "string",
-        pattern: "^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
-        description: "The cycle ID (UUID format)"
-      }
-    },
-    required: ["id"],
-    additionalProperties: false
-  }
-} as const;

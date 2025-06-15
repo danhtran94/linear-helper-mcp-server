@@ -174,7 +174,7 @@ export const listProjectMilestones: ToolHandler<ListProjectMilestonesParams> = a
           `   🆔 ${milestone.id}`,
           `   📊 ${progressPercent}% complete • 🎯 ${milestone.status}${targetDateStr}`,
           `   📁 Project: ${milestone.project?.name || "Unknown"}`,
-          ...(milestone.description ? [`   📝 ${milestone.description.substring(0, 100)}${milestone.description.length > 100 ? "..." : ""}`] : []),
+          ...(milestone.description ? [`   📝 ${milestone.description}`] : []),
           ""
         ].join("\n");
       }),
@@ -348,7 +348,7 @@ export const getProjectMilestone: ToolHandler<GetProjectMilestoneParams> = async
       `📁 **Project Information:**`,
       `   • **Name:** ${project?.name || "Unknown"}`,
       `   • **ID:** ${project?.id || "Unknown"}`,
-      ...(project?.description ? [`   • **Description:** ${project.description.substring(0, 150)}${project.description.length > 150 ? "..." : ""}`] : []),
+      ...(project?.description ? [`   • **Description:** ${project.description}`] : []),
       ...(project?.status ? [`   • **Status:** ${project.status.name} (${project.status.type})`] : []),
       ...(project?.lead ? [`   • **Lead:** ${project.lead.name} (${project.lead.email})`] : []),
       ...(project?.teams?.nodes && project.teams.nodes.length > 0 ? [
@@ -400,53 +400,3 @@ export const getProjectMilestone: ToolHandler<GetProjectMilestoneParams> = async
     };
   }
 };
-
-// MCP Schema definitions for the tools
-export const listProjectMilestonesSchema = {
-  name: "list_project_milestones",
-  description: "List project milestones with optional filtering by project, status, and search terms",
-  inputSchema: {
-    type: "object",
-    properties: {
-      projectId: {
-        type: "string",
-        pattern: "^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
-        description: "Filter milestones by project ID (UUID format)"
-      },
-      status: {
-        type: "string",
-        enum: ["unstarted", "next", "overdue", "done"],
-        description: "Filter milestones by status"
-      },
-      limit: {
-        type: "number",
-        minimum: 1,
-        maximum: 100,
-        default: 50,
-        description: "Maximum number of milestones to return (1-100)"
-      },
-      search: {
-        type: "string",
-        description: "Search milestones by name or description"
-      }
-    },
-    additionalProperties: false
-  }
-} as const;
-
-export const getProjectMilestoneSchema = {
-  name: "get_project_milestone",
-  description: "Get detailed information about a specific project milestone including associated issues",
-  inputSchema: {
-    type: "object",
-    properties: {
-      id: {
-        type: "string",
-        pattern: "^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
-        description: "The milestone ID (UUID format)"
-      }
-    },
-    required: ["id"],
-    additionalProperties: false
-  }
-} as const;

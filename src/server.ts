@@ -12,6 +12,7 @@
 
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import { z } from "zod";
 
 // Import modular components
 import {
@@ -24,24 +25,12 @@ import {
 import { log } from "./utils/logger.js";
 import { registerTool } from "./framework/mcp.js";
 import { healthCheck, healthCheckSchema } from "./tools/health.js";
-import {
-  listInitiatives,
-  listInitiativesSchema,
-  getInitiative,
-  getInitiativeSchema,
-} from "./tools/initiatives.js";
+import { listInitiatives, getInitiative } from "./tools/initiatives.js";
 import {
   listProjectMilestones,
-  listProjectMilestonesSchema,
   getProjectMilestone,
-  getProjectMilestoneSchema,
 } from "./tools/milestones.js";
-import {
-  listCycles,
-  listCyclesSchema,
-  getCycle,
-  getCycleSchema,
-} from "./tools/cycles.js";
+import { listCycles, getCycle } from "./tools/cycles.js";
 import { initializeLinearClient } from "./clients/linear.js";
 
 /**
@@ -100,29 +89,124 @@ async function main() {
   // Create MCP server instance
   const server = new McpServer(SERVER_INFO);
 
-  // Register tools
+  // Register tools using modern MCP SDK pattern with Zod validation
+
+  // Health check tool (no parameters)
   registerTool(server, "health_check", healthCheckSchema, healthCheck);
-  registerTool(
-    server,
+
+  // Initiative management tools
+  server.tool(
     "list_initiatives",
-    listInitiativesSchema,
-    listInitiatives
+    {
+      status: z
+        .enum(["Planned", "Active", "Completed"])
+        .optional()
+        .describe("Filter initiatives by status"),
+      limit: z
+        .number()
+        .min(1)
+        .max(100)
+        .default(50)
+        .describe("Maximum number of initiatives to return (1-100)"),
+      search: z
+        .string()
+        .optional()
+        .describe(
+          "Search term to filter initiatives by name, description, or content"
+        ),
+    },
+    async ({ status, limit = 50, search }) => {
+      return await listInitiatives({ status, limit, search });
+    }
   );
-  registerTool(server, "get_initiative", getInitiativeSchema, getInitiative);
-  registerTool(
-    server,
+
+  server.tool(
+    "get_initiative",
+    {
+      id: z.string().uuid("Must be a valid UUID").describe("The initiative ID"),
+    },
+    async ({ id }) => {
+      return await getInitiative({ id });
+    }
+  );
+
+  // Cycle management tools
+  server.tool(
+    "list_cycles",
+    {
+      teamId: z
+        .string()
+        .uuid()
+        .optional()
+        .describe("Filter cycles by team ID (UUID format)"),
+      status: z
+        .enum(["active", "next", "previous", "future", "past"])
+        .optional()
+        .describe("Filter cycles by status"),
+      limit: z
+        .number()
+        .min(1)
+        .max(100)
+        .default(50)
+        .describe("Maximum number of cycles to return (1-100)"),
+      search: z
+        .string()
+        .optional()
+        .describe("Search cycles by name or description"),
+    },
+    async ({ teamId, status, limit = 50, search }) => {
+      return await listCycles({ teamId, status, limit, search });
+    }
+  );
+
+  server.tool(
+    "get_cycle",
+    {
+      id: z.string().uuid("Must be a valid UUID").describe("The cycle ID"),
+    },
+    async ({ id }) => {
+      return await getCycle({ id });
+    }
+  );
+
+  // Project milestone management tools
+  server.tool(
     "list_project_milestones",
-    listProjectMilestonesSchema,
-    listProjectMilestones
+    {
+      projectId: z
+        .string()
+        .uuid()
+        .optional()
+        .describe("Filter milestones by project ID (UUID format)"),
+      status: z
+        .enum(["unstarted", "next", "overdue", "done"])
+        .optional()
+        .describe("Filter milestones by status"),
+      limit: z
+        .number()
+        .min(1)
+        .max(100)
+        .default(50)
+        .describe("Maximum number of milestones to return (1-100)"),
+      search: z
+        .string()
+        .optional()
+        .describe("Search milestones by name or description"),
+    },
+    async ({ projectId, status, limit = 50, search }) => {
+      return await listProjectMilestones({ projectId, status, limit, search });
+    }
   );
-  registerTool(
-    server,
+
+  server.tool(
     "get_project_milestone",
-    getProjectMilestoneSchema,
-    getProjectMilestone
+    {
+      id: z.string().uuid("Must be a valid UUID").describe("The milestone ID"),
+    },
+    async ({ id }) => {
+      return await getProjectMilestone({ id });
+    }
   );
-  registerTool(server, "list_cycles", listCyclesSchema, listCycles);
-  registerTool(server, "get_cycle", getCycleSchema, getCycle);
 
   // Setup transport
   const transport = new StdioServerTransport();
@@ -135,10 +219,10 @@ async function main() {
       "health_check",
       "list_initiatives",
       "get_initiative",
-      "list_project_milestones",
-      "get_project_milestone",
       "list_cycles",
       "get_cycle",
+      "list_project_milestones",
+      "get_project_milestone",
     ],
     tip: "Try: list_cycles to see team cycles across your workspace",
   });

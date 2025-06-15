@@ -72,6 +72,18 @@ async function testInitiativeTools() {
     console.error("❌ Error:", error);
   }
 
+  // Test 6: Get specific initiative (valid ID)
+  console.log("6️⃣ Testing get_initiative (valid ID):");
+  console.log("━".repeat(50));
+  try {
+    // Using the Q3-2025: Our Vision initiative ID from the list above
+    const result6 = await getInitiative({ id: "49bb95f1-33f6-4224-9ccd-6dc592c4583d" });
+    console.log(result6.content[0]?.text || "No content");
+    console.log("");
+  } catch (error) {
+    console.error("❌ Error:", error);
+  }
+
   console.log("✅ All tests completed!");
 }
 
