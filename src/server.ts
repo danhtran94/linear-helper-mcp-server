@@ -31,6 +31,7 @@ import {
   getProjectMilestone,
 } from "./tools/milestones.js";
 import { listCycles, getCycle } from "./tools/cycles.js";
+import { getFullIssue } from "./tools/issues.js";
 import { initializeLinearClient } from "./clients/linear.js";
 
 /**
@@ -208,6 +209,17 @@ async function main() {
     }
   );
 
+  // Issue management tools
+  server.tool(
+    "get_full_issue",
+    {
+      id: z.string().uuid("Must be a valid UUID").describe("The issue ID"),
+    },
+    async ({ id }) => {
+      return await getFullIssue({ id });
+    }
+  );
+
   // Setup transport
   const transport = new StdioServerTransport();
 
@@ -223,8 +235,9 @@ async function main() {
       "get_cycle",
       "list_project_milestones",
       "get_project_milestone",
+      "get_full_issue",
     ],
-    tip: "Try: list_cycles to see team cycles across your workspace",
+    tip: "Try: get_full_issue to retrieve complete issue details with full description",
   });
 }
 

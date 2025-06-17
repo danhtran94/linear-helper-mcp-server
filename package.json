@@ -21,7 +21,8 @@
     "dev-test:health": "bun scripts/dev-tests/health.ts",
     "dev-test:initiatives": "bun scripts/dev-tests/initiatives.ts",
     "dev-test:milestones": "bun scripts/dev-tests/milestones.ts",
-    "dev-test:cycles": "bun scripts/dev-tests/cycles.ts"
+    "dev-test:cycles": "bun scripts/dev-tests/cycles.ts",
+    "dev-test:issues": "bun scripts/dev-tests/issues.ts"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.12.1",

@@ -304,16 +304,27 @@ list_cycles({ "search": "sprint", "limit": 10 })
 get_cycle({ "id": "cycle-uuid-here" })
 ```
 
+### Issue Management ✨ NEW!
+- `get_full_issue` - Get complete issue information including full description and all metadata
+
+#### Issue Tools Usage Examples
+
+```bash
+# Get complete issue details with full description
+get_full_issue({ "id": "issue-uuid-here" })
+```
+
 *Coming soon: Advanced querying and mutation operations*
 
 ## Development Status
 
-**Current Phase**: Phase 3 - Initiative Management Tools  
-**Progress**: 3 tools implemented (health_check, list_initiatives, get_initiative)  
-**Completion**: 75% of Phase 1-3 features complete
-**Next Milestone**: Initiative Mutation Operations OR Cycle Management Tools
+**Current Phase**: Phase 6 - Enhanced Issue Management Tools ✨  
+**Progress**: 8 tools implemented (health_check, list_initiatives, get_initiative, list_cycles, get_cycle, list_project_milestones, get_project_milestone, get_full_issue)  
+**Completion**: 100% of Phase 1-5.1 features complete + Enhanced Issue Tools
+**Next Milestone**: Initiative Mutation Operations OR Advanced Analytics Tools
 
 ### Recent Achievements ✨
+- ✅ **NEW: Complete Issue Management**: Full issue details with untruncated descriptions 
 - ✅ **Enhanced Initiative Querying**: Full parameter support with filtering and search
 - ✅ **Type-Safe MCP Framework**: Generic parameter handling with TypeScript
 - ✅ **Production-Ready Error Handling**: Comprehensive validation and error messages
